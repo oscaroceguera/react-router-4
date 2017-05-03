@@ -2,46 +2,42 @@ import React from 'react';
 import {
   BrowserRouter as Router,
   Route,
-  Link,
-  Switch,
-  Redirect
+  Link
 } from 'react-router-dom'
 
-const Home = () => (
-  <p>
-    A <code>&lt;Switch></code> renders the
-    first child <code>&lt;Route></code> that
-    matches. A <code>&lt;Route></code> with
-    no <code>path</code> always matches.
-  </p>
-)
+const PEEPS = [
+  { id: 0, name: 'Michelle', friends: [ 1, 2, 3 ] },
+  { id: 1, name: 'Sean', friends: [ 0, 3 ] },
+  { id: 2, name: 'Kim', friends: [ 0, 1, 3 ], },
+  { id: 3, name: 'David', friends: [ 1, 2 ] }
+]
 
-const WillMatch = () => <h3>Matched!</h3>
+const find = (id) => PEEPS.find(p => p.id == id)
 
-const NoMatch = ({location}) => (
-  <div>
-    <h3>No Match for <code>{location.pathname}</code></h3>
-  </div>
-)
+const Person = ({ match }) => {
+  const person = find(match.params.id)
 
-const NoMatchExample = () => (
-  <Router>
+  return  (
     <div>
+      <h3>{person.name}'s friends'</h3>
       <ul>
-        <li><Link to="/">Home</Link></li>
-        <li><Link to="/old-match">Old Math, to be redirect</Link></li>
-        <li><Link to="/will-match">Will Match</Link></li>
-        <li><Link to="/will-not-match">Will Not Match</Link></li>
-        <li><Link to="/also/will/not/match">Also will Not Match</Link></li>
+        {person.friends.map(id => (
+          <li key={id}>
+            <Link to={`${match.url}/${id}`}>
+              {find(id).name}
+            </Link>
+          </li>
+        ))}
       </ul>
-      <Switch>
-        <Route path="/" exact component={Home} />
-        <Redirect from="/old-match" to="/will-match" />
-        <Route path="/will-match" component={WillMatch} />
-        <Route component={NoMatch} />
-      </Switch>
+      <Route path={`${match.url}/:id`} component={Person} />
     </div>
+  )
+}
+
+const RecursiveExample = () => (
+  <Router>
+    <Person match={{ params: { id: 0 }, url: ''}} />
   </Router>
 )
 
-export default NoMatchExample
+export default RecursiveExample
