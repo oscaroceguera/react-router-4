@@ -5,39 +5,63 @@ import {
   Link
 } from 'react-router-dom'
 
-const PEEPS = [
-  { id: 0, name: 'Michelle', friends: [ 1, 2, 3 ] },
-  { id: 1, name: 'Sean', friends: [ 0, 3 ] },
-  { id: 2, name: 'Kim', friends: [ 0, 1, 3 ], },
-  { id: 3, name: 'David', friends: [ 1, 2 ] }
+const routes = [
+  { path: '/',
+    exact: true,
+    sidebar: () => <div>home!</div>,
+    main: () => <h2>Home</h2>
+  },
+  { path: '/bubblegum',
+    sidebar: () => <div>bubblegum!</div>,
+    main: () => <h2>Bubblegum</h2>
+  },
+  { path: '/shoelaces',
+    sidebar: () => <div>shoelaces!</div>,
+    main: () => <h2>Shoelaces</h2>
+  }
 ]
 
-const find = (id) => PEEPS.find(p => p.id == id)
-
-const Person = ({ match }) => {
-  const person = find(match.params.id)
-
-  return  (
-    <div>
-      <h3>{person.name}'s friends'</h3>
-      <ul>
-        {person.friends.map(id => (
-          <li key={id}>
-            <Link to={`${match.url}/${id}`}>
-              {find(id).name}
-            </Link>
-          </li>
-        ))}
-      </ul>
-      <Route path={`${match.url}/:id`} component={Person} />
-    </div>
-  )
-}
-
-const RecursiveExample = () => (
+const SidebarExample = () => (
   <Router>
-    <Person match={{ params: { id: 0 }, url: ''}} />
+    <div style={{ display: 'flex' }}>
+      <div style={{
+        padding: '10px',
+        width: '40%',
+        background: '#f0f0f0'
+      }}>
+        <ul style={{ listStyleType: 'none', padding: 0 }}>
+          <li><Link to="/">Home</Link></li>
+          <li><Link to="/bubblegum">Bubblegum</Link></li>
+          <li><Link to="/shoelaces">Shoelaces</Link></li>
+        </ul>
+
+        {
+          routes.map(({path, exact, sidebar}, index) => (
+            <Route
+              key={index}
+              path={path}
+              exact={exact}
+              component={sidebar}
+            />
+          ))
+        }
+
+        <div style={{ flex: 1, padding: '10px' }}>
+          {
+            routes.map(({path, exact, main}, index) => (
+              <Route
+                key={index}
+                path={path}
+                exact={exact}
+                component={main}
+              />
+            ))
+          }
+        </div>
+      </div>
+
+    </div>
   </Router>
 )
 
-export default RecursiveExample
+export default SidebarExample
