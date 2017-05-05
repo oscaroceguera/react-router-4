@@ -1,36 +1,78 @@
-import React from 'react';
+import React from 'react'
 import {
   BrowserRouter as Router,
   Route,
-  Link,
-  Switch
+  Link
 } from 'react-router-dom'
 
-const About = () => <h2>About</h2>
-const Company = () => <h2>Company</h2>
-const User = ({match}) => (
+// Some folks find value in a centralized route config.
+// A route config is just data. React is great at mapping
+// data into components, and <Route> is a component.
+
+////////////////////////////////////////////////////////////
+// first our route components
+const Main = () => <h2>Main</h2>
+
+const Sandwiches = () => <h2>Sandwiches</h2>
+
+const Tacos = ({ routes }) => (
   <div>
-    <h2>User: {match.params.user}</h2>
+    <h2>Tacos</h2>
+    <ul>
+      <li><Link to="/tacos/bus">Bus</Link></li>
+      <li><Link to="/tacos/cart">Cart</Link></li>
+    </ul>
+
+    {routes.map((route, i) => (
+      <RouteWithSubRoutes key={i} {...route}/>
+    ))}
   </div>
 )
 
-const AmbiguosExample = () => (
+const Bus = () => <h3>Bus</h3>
+const Cart = () => <h3>Cart</h3>
+
+////////////////////////////////////////////////////////////
+// then our route config
+const routes = [
+  { path: '/sandwiches',
+    component: Sandwiches
+  },
+  { path: '/tacos',
+    component: Tacos,
+    routes: [
+      { path: '/tacos/bus',
+        component: Bus
+      },
+      { path: '/tacos/cart',
+        component: Cart
+      }
+    ]
+  }
+]
+
+// wrap <Route> and use this everywhere instead, then when
+// sub routes are added to any route it'll work
+const RouteWithSubRoutes = (route) => (
+  <Route path={route.path} render={props => (
+    // pass the sub-routes down to keep nesting
+    <route.component {...props} routes={route.routes}/>
+  )}/>
+)
+
+const RouteConfigExample = () => (
   <Router>
     <div>
       <ul>
-        <li><Link to="/about">About Us (static)</Link></li>
-        <li><Link to="/compnay">commpany (static)</Link></li>
-        <li><Link to="/kim">Kim (Dinamic)</Link></li>
-        <li><Link to="/chris">Chris (Dinamic)</Link></li>
+        <li><Link to="/tacos">Tacos</Link></li>
+        <li><Link to="/sandwiches">Sandwiches</Link></li>
       </ul>
 
-      <Switch>
-        <Route path="/about" component={About} />
-        <Route path="/company" component={Company} />
-        <Route path="/:user" component={User} />
-      </Switch>
+      {routes.map((route, i) => (
+        <RouteWithSubRoutes key={i} {...route}/>
+      ))}
     </div>
   </Router>
 )
 
-export default AmbiguosExample
+export default RouteConfigExample
